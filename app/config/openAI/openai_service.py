@@ -1,8 +1,11 @@
 import io
+import json
 
 import openai
 from fastapi import HTTPException,UploadFile
 from dotenv import load_dotenv
+from app.models.feedback import Feedback
+from sqlalchemy.orm import Session
 import os
 
 # .env 파일 로드
@@ -53,3 +56,22 @@ def get_grammar_feedback(prompt: str, messages: list) -> str:
         return response["choices"][0]["message"]["content"]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"문법 피드백 생성 실패: {str(e)}")
+
+
+def get_pronunciation_feedback(azure_response: str, messages: list ) -> str:
+    messages.append({
+        "role": "user",
+        "content": (
+            "Here is the pronunciation assessment data from Azure. "
+            "Provide feedback within 30 words:\n\n"
+            f"{json.dumps(azure_response)}"
+        )
+    })
+    # 2) GPT 호출
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=messages)  # GPT 호출
+        return response["choices"][0]["message"]["content"]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate GPT feedback: {str(e)}")

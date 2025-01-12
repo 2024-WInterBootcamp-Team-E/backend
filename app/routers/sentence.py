@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException, UploadFile
 from sqlalchemy.orm import Session
+from app.services.speech_service import get_sentences_by_situation
 from app.database.session import get_db
 from app.services.speech_service import get_sentences_by_situation, get_sentence, get_pronunciation_feedback, \
     create_pronunciation_result, get_sentence_detail
@@ -7,14 +9,18 @@ from app.models.sentence import Sentence
 from app.models.feedback import Feedback
 from app.schemas.feedback import PronunciationResultResponse
 from app.schemas.ResultResponseModel import ResultResponseModel
+from fastapi import APIRouter
+from app.models.sentence import Sentence  # Sentence 모델 import
 
-# APIRouter 생성
+
+
 router = APIRouter(
     prefix="/speech",
     tags=["Speech"]
 )
 
-# 상황 문장 목록 조회 API
+
+# 기존 상황 문장 목록 조회 API
 @router.get("/situationType/all", summary="상황 문장 목록 조회", description="특정 상황 유형에 해당하는 모든 문장을 조회합니다.")
 def fetch_sentences(situation: str, db: Session = Depends(get_db)):
     sentences = get_sentences_by_situation(situation, db)
@@ -49,3 +55,5 @@ def get_pronunciation_results(user_id: int, sentence_id: int, db: Session = Depe
     # 응답 데이터 생성
     response_data = create_pronunciation_result(feedback, sentence)
     return ResultResponseModel(code=200, message="발음 테스트 결과 반환 성공", data=response_data)
+
+
