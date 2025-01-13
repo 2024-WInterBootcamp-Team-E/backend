@@ -23,3 +23,4 @@ uvicorn==0.34.0
 python-multipart==0.0.6
 openai==0.28.0  # 추가된 부분
 azure-cognitiveservices-speech==1.41.1
+pymongo==4.10.1
