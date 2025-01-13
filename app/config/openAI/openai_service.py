@@ -77,7 +77,7 @@ def get_pronunciation_feedback(azure_response: str, messages: list ) -> str:
         raise HTTPException(status_code=500, detail=f"Failed to generate GPT feedback: {str(e)}")
     """
 
-def get_pronunciation_feedback(azure_response: dict) -> str:
+async def get_pronunciation_feedback(azure_response: dict) -> str:
     # Azure 결과를 문자열로 변환
     azure_response_str = "\n".join(
         f"{key}: {value}" for key, value in azure_response.items()
@@ -89,14 +89,14 @@ def get_pronunciation_feedback(azure_response: dict) -> str:
             "role": "user",
             "content": (
                 f"다음 데이터는 Azure의 발음 평가 결과입니다:\n\n{azure_response_str}\n\n"
-                "문제가 있다면 수정 제안 및 피드백을 30단어 이내로 제공해주세요. "
+                "이 문장들의 결과를 토대로 내가 어디 단어가 문제이고 어디 발음이 문제인지 발음결과토대로 요약해서 핵심만 알려줘 "
                 "친절한 한국어로 작성해주세요."
             )
         }
     ]
 
     try:
-        response = openai.ChatCompletion.create(
+        response = await openai.ChatCompletion.acreate(  # 비동기 호출로 변경
             model="gpt-4",
             messages=messages
         )
