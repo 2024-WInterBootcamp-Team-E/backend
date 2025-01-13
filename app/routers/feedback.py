@@ -4,7 +4,7 @@ from app.database.session import get_db
 from app.config.azure.pronunciation_feedback import analyze_pronunciation_with_azure
 from app.services.feedback_service import create_feedback_from_azure_response
 from app.models.sentence import Sentence
-
+from app.config.openAI.openai_service import get_pronunciation_feedback
 
 router = APIRouter(
     prefix="/feedback",
@@ -52,14 +52,14 @@ async def analyze_pronunciation_endpoint(
     사용자로부터 텍스트와 오디오 파일을 받아 Azure 발음 평가 결과를 반환.
     """
     try:
-        # 1. 오디오 데이터를 bytes로 읽기
         audio_data = await audio_file.read()
 
-        # 2. Azure 발음 평가 수행
-        result = await analyze_pronunciation_with_azure(text, audio_data)
-
-        # 3. 결과 반환 (Azure 평가 결과 전체 반환)
-        return result
+        azure_result = await analyze_pronunciation_with_azure(text, audio_data)
+        print(f"[LOG] Azure Result: {azure_result}")
+        gpt_reuslt = await get_pronunciation_feedback(azure_result)
+        return {
+            "gpt_result": gpt_reuslt
+        }
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
