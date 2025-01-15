@@ -1,18 +1,13 @@
 from elevenlabs import voices
+from dotenv import load_dotenv
+import os
 
-# ElevenLabs API Key 설정
-API_KEY = "sk_c1b1d94a65f415a2576b8cb59bb952474ea4ebb57d731a37"  # ElevenLabs 대시보드에서 복사한 API Key
+load_dotenv()
 
-# 사용 가능한 음성 목록 가져오기
-voices_list = voices(api_key=API_KEY)  # voices() 함수 호출로 음성 목록 가져오기
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
-# Voice 목록 출력
+voices_list = voices(api_key=ELEVENLABS_API_KEY)
+
 print("Available Voices:")
 for voice in voices_list:
     print(f"Voice Name: {voice.name}, Voice ID: {voice.voice_id}")
-
-
-
-
-
-#API_KEY = "sk_c1b1d94a65f415a2576b8cb59bb952474ea4ebb57d731a37"
